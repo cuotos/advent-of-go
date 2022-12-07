@@ -1,6 +1,8 @@
 package five
 
 import (
+	"bufio"
+	"bytes"
 	"regexp"
 	"strconv"
 )
@@ -18,27 +20,56 @@ import (
 //  1   2   3   4   5   6   7   8   9
 
 type State struct {
-	Rows [8][]rune
+	Rows [9][]rune
 }
 
-func DefaultState() *State {
+func (s *State) move(m move) {
+	for i := 0; i < m.count; i++ {
+		s.Rows[m.dest-1] = append(s.Rows[m.dest-1], s.Rows[m.src-1][len(s.Rows[m.src-1])-1])
+		s.Rows[m.src-1] = s.Rows[m.src-1][:len(s.Rows[m.src-1])-1]
+	}
+}
+
+func (s *State) printState() string {
+	output := ""
+
+	for _, r := range s.Rows {
+		if len(r) > 0 {
+			output = output + string(r[len(r)-1:])
+		}
+	}
+	return output
+}
+
+func InitialState() *State {
 	state := &State{
-		Rows: [8][]rune{
+		Rows: [9][]rune{
 			{'R', 'N', 'F', 'V', 'L', 'J', 'S', 'M'},
-			{},
-			{},
-			{},
-			{},
-			{},
-			{},
-			{},
+			{'P', 'N', 'D', 'Z', 'F', 'J', 'W', 'H'},
+			{'W', 'R', 'C', 'D', 'G'},
+			{'N', 'B', 'S'},
+			{'M', 'Z', 'W', 'P', 'C', 'B', 'F', 'N'},
+			{'P', 'R', 'M', 'W'},
+			{'R', 'T', 'N', 'G', 'L', 'S', 'W'},
+			{'Q', 'T', 'H', 'F', 'N', 'B', 'V'},
+			{'L', 'M', 'H', 'Z', 'N', 'F'},
 		},
 	}
 	return state
 }
 
-func Run() int {
-	return 0
+func Run(input []byte, s *State) string {
+
+	scanner := bufio.NewScanner(bytes.NewReader(input))
+	scanner.Split(bufio.ScanLines)
+
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		move := parseLine(line)
+		s.move(move)
+	}
+
+	return s.printState()
 }
 
 type move struct {
@@ -63,7 +94,7 @@ func atoi(a string) int {
 	return i
 }
 
-var rawInstructions = []byte(`move 1 from 7 to 6
+var RawInstructions = []byte(`move 1 from 7 to 6
 move 1 from 9 to 4
 move 4 from 9 to 6
 move 1 from 2 to 3

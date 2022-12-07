@@ -23,7 +23,7 @@ func run() error {
 	// log.Println("day2pt2", two.Run(c.MustGetInput(2)))
 	// log.Println(three.Run(c.MustGetInput(3)))
 	// log.Println(four.Run(c.MustGetInput(4)))
-	log.Println(five.Run())
+	log.Println(five.Run(five.RawInstructions, five.InitialState()))
 
 	return nil
 }
