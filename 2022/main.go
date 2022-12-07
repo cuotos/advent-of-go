@@ -1,6 +1,7 @@
 package main
 
 import (
+	"2022/two"
 	"2022/utils"
 	"log"
 	"os"
@@ -19,7 +20,7 @@ func run() error {
 	// log.Println("day1pt1", day1Pt1(c.MustGetInput(1)))
 	// log.Println("day1pt2", day1Pt2(c.MustGetInput(1)))
 	// log.Println("day2pt1", day2Pt1(c.MustGetInput(2)))
-	log.Println("day2pt2", day2Pt1(c.MustGetInput(2)))
+	log.Println("day2pt2", two.Day2(c.MustGetInput(2)))
 
 	return nil
 }
