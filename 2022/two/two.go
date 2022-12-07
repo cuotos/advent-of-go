@@ -63,7 +63,7 @@ const (
 	Win
 )
 
-func Day2(input []byte) int {
+func Run(input []byte) int {
 	game := parseGame(input)
 
 	totalScore := 0
