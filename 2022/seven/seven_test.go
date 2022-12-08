@@ -1,6 +1,7 @@
 package seven
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,57 +46,25 @@ $ ls
 5626152 d.ext
 7214296 k`
 
-func TestGetSizeOfDir(t *testing.T) {
-	f1 := &File{Name: "f1", size: 10}
-	f2 := &File{Name: "f2", size: 20}
+func TestDemo(t *testing.T) {
+	root := process([]byte(testInput))
+	total := ProcessTree(root)
 
-	f3 := &File{Name: "f3", size: 1}
-	f4 := &File{Name: "f4", size: 2}
-
-	f5 := &File{Name: "f5", size: 1}
-	f6 := &File{Name: "f6", size: 2}
-
-	d3 := &Dir{
-		Name:  "dir3",
-		Files: []*File{f5, f6},
-	}
-
-	d2 := &Dir{
-		Name:  "dir2",
-		Files: []*File{f3, f4},
-		Dirs:  []*Dir{d3},
-	}
-
-	d1 := &Dir{
-		Name:  "/",
-		Files: []*File{f1, f2},
-		Dirs:  []*Dir{d2},
-	}
-
-	expectedTree := `- / (dir, size=36)
-  - f1 (file, size=10)
-  - f2 (file, size=20)
-  - dir2 (dir, size=6)
-    - f3 (file, size=1)
-    - f4 (file, size=2)
-    - dir3 (dir, size=3)
-      - f5 (file, size=1)
-      - f6 (file, size=2)
-`
-
-	assert.Equal(t, 36, d1.Size())
-	assert.Equal(t, expectedTree, d1.Tree())
+	assert.Equal(t, 95437, total)
 }
 
-func TestParseLine(t *testing.T) {
+func TestProcess(t *testing.T) {
 
-}
+	input := []byte(`$ cd /
+$ ls
+dir a
+1 b.txt
+$ cd a
+$ ls
+100 c.txt`)
+	_ = input
 
-func TestSandbox(t *testing.T) {
-	// rootDir := &Dir{}
-	// s := State{
-	// 	CurrentDir: rootDir,
-	// 	RootDir:    rootDir,
-	// }
-
+	root := process([]byte(testInput))
+	total := ProcessTree(root)
+	fmt.Println("total", total)
 }

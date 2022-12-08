@@ -1,97 +1,127 @@
 package seven
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"strconv"
+	"strings"
 )
 
-type State struct {
-	CurrentDir *Dir
-	RootDir    *Dir
-}
-
-type Object interface {
-	Size() int
-}
-
-type File struct {
-	Name string
-	size int
-}
-
-func (f *File) String() string {
-	return fmt.Sprintf("file: %s, size: %d", f.Name, f.size)
-}
-
-func (f *File) Size() int {
-	return f.size
-}
-
 type Dir struct {
-	Name  string
-	Dirs  []*Dir
-	Files []*File
-}
-
-func (d *Dir) String() string {
-	return fmt.Sprintf("dir: %s, size: %d", d.Name, d.Size())
+	Name   string
+	Parent *Dir
+	Dirs   []*Dir
+	Files  []*File
 }
 
 func (d *Dir) Size() int {
 	total := 0
 
 	for _, f := range d.Files {
-		total += f.size
+		total += f.Size
 	}
 
 	for _, d := range d.Dirs {
 		total += d.Size()
 	}
+
 	return total
 }
 
-func (d *Dir) LS() string {
-	output := ""
+type File struct {
+	Name string
+	Size int
+
+	Parent *Dir
+}
+
+func process(input []byte) *Dir {
+	scanner := bufio.NewScanner(bytes.NewReader(input))
+
+	root := &Dir{
+		Name: "/",
+	}
+
+	var curDir *Dir
+	_ = curDir
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "$ cd ") {
+			dirName := strings.TrimPrefix(line, "$ cd ")
+
+			if dirName == ".." {
+				curDir = curDir.Parent
+				continue
+			}
+			if dirName == "/" {
+				curDir = root
+			} else {
+				d := &Dir{
+					Name:   dirName,
+					Parent: curDir,
+				}
+
+				curDir.Dirs = append(curDir.Dirs, d)
+
+				curDir = d
+			}
+		}
+
+		if !strings.HasPrefix(line, "$") {
+			// if the line starts with "dir" its a dir, else its a file
+			if strings.HasPrefix(line, "dir") {
+				// there is a dir
+				continue
+			} else {
+				// this is a file
+				split := strings.Split(line, " ")
+				fileSize, _ := strconv.Atoi(split[0])
+
+				f := &File{
+					Name: split[1],
+					Size: fileSize,
+				}
+
+				curDir.Files = append(curDir.Files, f)
+			}
+
+		}
+	}
+
+	return root
+}
+
+func (d *Dir) Tree(indent string) {
+	fmt.Printf("%s- %s (dir, size: %d)\n", indent, d.Name, d.Size())
+	for _, f := range d.Files {
+		fmt.Printf("%s- %s (file, size: %d)\n", indent+"  ", f.Name, f.Size)
+	}
 
 	for _, d := range d.Dirs {
-		output += fmt.Sprintln(d.String())
+		d.Tree("  ")
 	}
-
-	for _, f := range d.Files {
-		output += fmt.Sprintln(f.String())
-	}
-
-	return output
 }
 
-func (d *Dir) Tree() string {
-	output := printDir(d, "")
-	return output
-}
+type Filter func(d *Dir) int
 
-func printDir(d *Dir, indent string) string {
-	output := fmt.Sprintf("%s- %s (dir, size=%d)\n", indent, d.Name, d.Size())
+func ProcessTree(d *Dir, filters ...Filter) int {
+	total := 0
 
-	for _, f := range d.Files {
-		output += fmt.Sprintf("%s- %s (file, size=%d)\n", indent+"  ", f.Name, f.size)
-	}
 	for _, d := range d.Dirs {
-		output += printDir(d, indent+"  ")
+		if d.Size() <= 100000 {
+			total += d.Size()
+		}
+		total += ProcessTree(d)
 	}
-	return output
-}
 
-func ParseLine(input []byte) {
-	if bytes.HasPrefix(input, []byte("$ ")) {
-		ParseInstruction(input)
-	} else {
-		ParseInfo(input)
-	}
+	return total
 }
-
-func ParseInstruction(input []byte) {}
-func ParseInfo(input []byte)        {}
 
 func Run(input []byte) int {
-	return 0
+	d := process(input)
+	i := ProcessTree(d)
+
+	return i
 }
