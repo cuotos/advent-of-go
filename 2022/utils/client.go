@@ -1,11 +1,13 @@
 package utils
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 type Client struct {
@@ -14,9 +16,12 @@ type Client struct {
 
 func (c *Client) GetInput(day int) ([]byte, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
 	url := fmt.Sprintf("https://adventofcode.com/2022/day/%d/input", day)
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, err
 	}

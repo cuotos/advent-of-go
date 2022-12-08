@@ -115,20 +115,3 @@ func TestParse(t *testing.T) {
 		assert.Equal(t, tc.expected, actual)
 	}
 }
-
-func TestXxx(t *testing.T) {
-	input := []byte(`8-18,10-19
-	1-100,10-15
-	12-69,8-15
-	62-77,36-50
-	26-27,26-91
-	16-23,24-63
-	17-43,18-44
-5-10,6-9
-	29-68,29-70
-	15-90,28-91
-	8-39,10-40`)
-
-	actual := Run(input)
-	assert.Equal(t, 2, actual)
-}

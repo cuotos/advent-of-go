@@ -23,13 +23,6 @@ type State struct {
 	Rows [9][]rune
 }
 
-func (s *State) move(m move) {
-	for i := 0; i < m.count; i++ {
-		s.Rows[m.dest-1] = append(s.Rows[m.dest-1], s.Rows[m.src-1][len(s.Rows[m.src-1])-1])
-		s.Rows[m.src-1] = s.Rows[m.src-1][:len(s.Rows[m.src-1])-1]
-	}
-}
-
 func (s *State) printState() string {
 	output := ""
 
@@ -39,6 +32,26 @@ func (s *State) printState() string {
 		}
 	}
 	return output
+}
+
+type Crane interface {
+	Move(*State, instruction)
+}
+
+type CrateMover9000 struct{}
+
+func (mover CrateMover9000) Move(s *State, m instruction) {
+	for i := 0; i < m.count; i++ {
+		s.Rows[m.dest-1] = append(s.Rows[m.dest-1], s.Rows[m.src-1][len(s.Rows[m.src-1])-1])
+		s.Rows[m.src-1] = s.Rows[m.src-1][:len(s.Rows[m.src-1])-1]
+	}
+}
+
+type CrateMover9001 struct{}
+
+func (mover CrateMover9001) Move(s *State, m instruction) {
+	s.Rows[m.dest-1] = append(s.Rows[m.dest-1], s.Rows[m.src-1][len(s.Rows[m.src-1])-m.count:]...)
+	s.Rows[m.src-1] = s.Rows[m.src-1][:len(s.Rows[m.src-1])-m.count]
 }
 
 func InitialState() *State {
@@ -58,7 +71,7 @@ func InitialState() *State {
 	return state
 }
 
-func Run(input []byte, s *State) string {
+func Run(input []byte, s *State, m Crane) string {
 
 	scanner := bufio.NewScanner(bytes.NewReader(input))
 	scanner.Split(bufio.ScanLines)
@@ -66,23 +79,23 @@ func Run(input []byte, s *State) string {
 	for scanner.Scan() {
 		line := scanner.Bytes()
 		move := parseLine(line)
-		s.move(move)
+		m.Move(s, move)
 	}
 
 	return s.printState()
 }
 
-type move struct {
+type instruction struct {
 	count int
 	src   int
 	dest  int
 }
 
-func parseLine(input []byte) move {
+func parseLine(input []byte) instruction {
 	r := regexp.MustCompile(`move (?P<count>\d*) from (?P<src>\d*) to (?P<dest>\d*)`)
 	found := r.FindStringSubmatch(string(input))
 
-	return move{
+	return instruction{
 		count: atoi(found[1]),
 		src:   atoi(found[2]),
 		dest:  atoi(found[3]),

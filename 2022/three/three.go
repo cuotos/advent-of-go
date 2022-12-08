@@ -18,7 +18,7 @@ type Rucksack struct {
 }
 
 func Run(input []byte) int {
-	return getTotal(input)
+	return getTotalPart1(input)
 }
 
 func parseLine(input []byte) Rucksack {
@@ -40,7 +40,20 @@ func parseLine(input []byte) Rucksack {
 	return r
 }
 
-func getTotal(input []byte) int {
+func getTotalPart1(input []byte) int {
+	scanner := bufio.NewScanner(bytes.NewReader(input))
+
+	total := 0
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		r := parseLine(line)
+
+		total += r.priority
+	}
+	return total
+}
+
+func getTotalPart2(input []byte) int {
 	scanner := bufio.NewScanner(bytes.NewReader(input))
 
 	total := 0

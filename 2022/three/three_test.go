@@ -96,7 +96,7 @@ func TestGetTotal(t *testing.T) {
 	ttgJtRGJQctTZtZT
 	CrZsJsPPZsGzwwsLwLmpwMDw`)
 
-	assert.Equal(t, 157, getTotal(input))
+	assert.Equal(t, 157, getTotalPart1(input))
 }
 
 func TestThreeWayContains(t *testing.T) {
@@ -138,6 +138,6 @@ Za
 Zb
 Zc`)
 
-	total := getTotal(input)
+	total := getTotalPart2(input)
 	assert.Equal(t, 1+26+52, total)
 }
