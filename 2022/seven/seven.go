@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+const (
+	totalSpace        = 70000000
+	requiredFreeSpace = 30000000
+)
+
 type Dir struct {
 	Name   string
 	Parent *Dir
@@ -120,8 +125,35 @@ func ProcessTree(d *Dir, filters ...Filter) int {
 }
 
 func Run(input []byte) int {
-	d := process(input)
-	i := ProcessTree(d)
+	root := process(input)
 
-	return i
+	var candidate *Dir
+
+	currentFree := totalSpace - root.Size()
+	needToFree := requiredFreeSpace - currentFree
+
+	for _, d := range extractDirs(root) {
+		if d.Size() > needToFree {
+			if candidate == nil {
+				candidate = d
+			}
+
+			if d.Size() < candidate.Size() {
+				candidate = d
+			}
+		}
+	}
+
+	fmt.Println(candidate.Name, candidate.Size())
+	return candidate.Size()
+}
+
+func extractDirs(d *Dir) []*Dir {
+	allDirs := []*Dir{}
+	for _, d := range d.Dirs {
+		allDirs = append(allDirs, d)
+		allDirs = append(allDirs, extractDirs(d)...)
+	}
+
+	return allDirs
 }

@@ -68,3 +68,14 @@ $ ls
 	total := ProcessTree(root)
 	fmt.Println("total", total)
 }
+
+func TestDemoPt2(t *testing.T) {
+	i := Run([]byte(testInput))
+	fmt.Println(i)
+}
+
+func PrintEach(s []*Dir) {
+	for _, i := range s {
+		fmt.Println(i.Name, i.Size())
+	}
+}

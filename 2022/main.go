@@ -1,7 +1,7 @@
 package main
 
 import (
-	"2022/seven"
+	"2022/eight"
 	"2022/utils"
 	"log"
 	"os"
@@ -25,7 +25,8 @@ func run() error {
 	// log.Println(four.Run(c.MustGetInput(4)))
 	// log.Println(five.Run(five.RawInstructions, five.InitialState(), five.CrateMover9001{}))
 	// log.Println(six.Run(c.MustGetInput(6)))
-	log.Println((seven.Run(c.MustGetInput(7))))
+	// log.Println((seven.Run(c.MustGetInput(7))))
+	log.Println((eight.Run(c.MustGetInput(8))))
 
 	return nil
 }
