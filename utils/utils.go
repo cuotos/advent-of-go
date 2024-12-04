@@ -3,17 +3,22 @@ package utils
 import (
 	"bufio"
 	"bytes"
-	"io/ioutil"
+	"os"
 )
 
-func ReadFileLines(filename string) []string {
-	fileContent, err := ioutil.ReadFile(filename)
-
-	lines := []string{}
+func GetFileAsBytes(filename string) []byte {
+	fileContent, err := os.ReadFile(filename)
 
 	if err != nil {
 		panic(err)
 	}
+
+	return fileContent
+}
+
+func ReadLines(fileContent []byte) []string {
+
+	lines := []string{}
 
 	scanner := bufio.NewScanner(bytes.NewReader(fileContent))
 
